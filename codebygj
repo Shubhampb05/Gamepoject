@@ -1,0 +1,87 @@
+        // Checks if the board is completely filled
+        private bool IsBoardFull()
+        {
+            for (int j = 0; j < Cols; j++)
+                if (board[0, j] == '.')         // If any top cell is empty, board isn't full
+                    return false;
+            return true;                        // All columns are full
+        }
+
+        // Switches the current player from X to O or vice versa
+        private void SwitchPlayer()
+        {
+            currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+        }
+
+        // Main game loop
+        public void Start()
+        {
+            while (true)
+            {
+                DisplayBoard(); // Show the current state of the board
+
+                try
+                {
+                    Console.Write($"Player {currentPlayer}, choose a column (0-{Cols - 1}): ");
+                    string input = Console.ReadLine();
+
+                    // Validate input: must be a number
+                    if (!int.TryParse(input, out int col))
+                        throw new Exception("Invalid input. Please enter a number.");
+
+                    // Check if input is within valid range
+                    if (col < 0 || col >= Cols)
+                        throw new Exception($"Invalid column. Enter a number between 0 and {Cols - 1}.");
+
+                    // Try to drop disc into the selected column
+                    if (!DropDisc(col))
+                    {
+                        Console.WriteLine("Column is full! Press any key to continue...");
+                        Console.ReadKey();
+                        continue; // Let player try again
+                    }
+
+                    // Check if this move wins the game
+                    if (CheckWin())
+                    {
+                        DisplayBoard();
+                        Console.WriteLine($"Player {currentPlayer} wins!");
+                        Console.WriteLine("Press any key to exit...");
+                        Console.ReadKey();
+                        break;
+                    }
+
+                    // Check if the game is a draw
+                    if (IsBoardFull())
+                    {
+                        DisplayBoard();
+                        Console.WriteLine("It's a draw!");
+                        Console.WriteLine("Press any key to exit...");
+                        Console.ReadKey();
+                        break;
+                    }
+
+                    // Move to the next player
+                    SwitchPlayer();
+                }
+                catch (Exception ex)
+                {
+                    // Catch invalid input or range errors
+                    Console.WriteLine($"Error: {ex.Message}");
+                    Console.WriteLine("Press any key to try again...");
+                    Console.ReadKey();
+                }
+            }
+        }
+    }
+
+    // Entry point of the program
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Connect4 game = new Connect4(); // Create game instance
+            game.Start();                   // Start the game
+        }
+    }
+}

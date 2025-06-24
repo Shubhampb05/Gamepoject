@@ -1,0 +1,104 @@
+using System;
+
+namespace Connect_four_oop
+{
+    // Define a game interface with general properties and a Start method
+    public interface Games
+    {
+        string Name { get; }               // Name of the game
+        int NumberOfPlayers { get; }       // Number of players
+        int Rows { get; }                  // Number of rows on the board
+        int Cols { get; }                  // Number of columns on the board
+        void Start();                      // Method to start the game
+    }
+
+    // Connect4 class implements the Games interface
+    public class Connect4 : Games
+    {
+        public string Name => "Connect Four";   // Game name
+        public int NumberOfPlayers => 2;        // 2-player game
+        public int Rows => 6;                   // 6 rows in the game board
+        public int Cols => 7;                   // 7 columns in the game board
+
+        private char[,] board;                  // 2D array to represent the game board
+        private char currentPlayer;             // Tracks current player ('X' or 'O')
+
+        // Constructor initializes the game
+        public Connect4()
+        {
+            board = new char[Rows, Cols];       // Create a 6x7 board
+            InitializeBoard();                  // Fill board with '.'
+            currentPlayer = 'X';                // X starts first
+        }
+
+        // Fills the board with '.' to show empty cells
+        private void InitializeBoard()
+        {
+            for (int i = 0; i < Rows; i++)
+                for (int j = 0; j < Cols; j++)
+                    board[i, j] = '.';
+        }
+
+        // Displays the board in the console
+        private void DisplayBoard()
+        {
+            Console.Clear();                    // Clear console for clean display
+            for (int i = 0; i < Rows; i++)
+            {
+                for (int j = 0; j < Cols; j++)
+                    Console.Write(board[i, j] + " ");
+                Console.WriteLine();            // New line after each row
+            }
+            for (int j = 0; j < Cols; j++)
+                Console.Write(j + " ");         // Display column numbers
+            Console.WriteLine();
+        }
+
+        // Drops the current player's disc into the chosen column
+        private bool DropDisc(int col)
+        {
+            for (int i = Rows - 1; i >= 0; i--) // Start from bottom row
+            {
+                if (board[i, col] == '.')       // Find the first empty spot
+                {
+                    board[i, col] = currentPlayer; // Drop the disc
+                    return true;
+                }
+            }
+            return false; // Column is full
+        }
+
+        // Checks all win conditions for the current player
+        private bool CheckWin()
+        {
+            char p = currentPlayer;
+
+            // Check horizontal win
+            for (int i = 0; i < Rows; i++)
+                for (int j = 0; j <= Cols - 4; j++)
+                    if (board[i, j] == p && board[i, j + 1] == p &&
+                        board[i, j + 2] == p && board[i, j + 3] == p)
+                        return true;
+
+            // Check vertical win
+            for (int j = 0; j < Cols; j++)
+                for (int i = 0; i <= Rows - 4; i++)
+                    if (board[i, j] == p && board[i + 1, j] == p &&
+                        board[i + 2, j] == p && board[i + 3, j] == p)
+                        return true;
+
+            // Check diagonal "/" win
+            for (int i = 3; i < Rows; i++)
+                for (int j = 0; j <= Cols - 4; j++)
+                    if (board[i, j] == p && board[i - 1, j + 1] == p &&
+                        board[i - 2, j + 2] == p && board[i - 3, j + 3] == p)
+                        return true;
+
+            // Check diagonal "\" win
+            for (int i = 0; i <= Rows - 4; i++)
+                for (int j = 0; j <= Cols - 4; j++)
+                    if (board[i, j] == p && board[i + 1, j + 1] == p &&
+                        board[i + 2, j + 2] == p && board[i + 3, j + 3] == p)
+                        return true;
+
+            return false; // No win found
